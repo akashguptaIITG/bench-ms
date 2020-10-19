@@ -1,0 +1,36 @@
+version: "3.7"
+services:
+  bench-ms-user-api:
+    build: ./user-api
+    image: akashgupta01/bench-ms-user-api:latest
+    ports:
+      - "7001:7001"
+  bench-ms-order-api:
+    build: ./order-api
+    image: akashgupta01/bench-ms-order-api:latest
+    ports:
+      - "7002:7002"
+  bench-ms-aggregator-api:
+    build: ./aggregator-api
+    image: akashgupta01/bench-ms-aggregator-api:latest
+    depends_on:
+      - bench-ms-order-api
+      - bench-ms-user-api
+    ports:
+      - "7003:7003"
+    environment:
+      USER_API_URL: http://bench-ms-user-api:7001
+      ORDERS_API_URL: http://bench-ms-order-api:7002
+
+  bench-ms-jaeger-service:
+    image: jaegertracing/all-in-one:latest
+    environment:
+      - COLLECTOR_ZIPKIN_HTTP_PORT=9411
+    ports:
+      - "5775:5775/udp"
+      - "6831:6831/udp"
+      - "6832:6832/udp"
+      - "5778:5778"
+      - "16686:16686"
+      - "14268:14268"
+      - "9411:9411"

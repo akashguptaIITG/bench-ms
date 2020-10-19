@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bench-ms-config
+  namespace: default
+data:
+  USER_API_URL: http://bench-ms-user-api-service
+  ORDERS_API_URL: http://bench-ms-order-api-service

@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bench-ms-order-api
+  labels:
+    app: bench-ms-order-api
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: bench-ms-order-api
+  template:
+    metadata:
+      labels:
+        app: bench-ms-order-api
+    spec:
+      containers:
+        - name: bench-ms-order-api
+          image: akashgupta01/bench-ms-order-api
+          ports:
+            - containerPort: 7002

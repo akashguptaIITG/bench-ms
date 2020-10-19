@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bench-ms-aggregator-api
+  labels:
+    app: bench-ms-aggregator-api
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: bench-ms-aggregator-api
+  template:
+    metadata:
+      labels:
+        app: bench-ms-aggregator-api
+    spec:
+      containers:
+        - name: bench-ms-aggregator-api
+          image: akashgupta01/bench-ms-aggregator-api
+          ports:
+            - containerPort: 7003
+          env:
+            - name: USER_API_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: bench-ms-config
+                  key: USER_API_URL
+            - name: ORDERS_API_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: bench-ms-config
+                  key: ORDERS_API_URL
