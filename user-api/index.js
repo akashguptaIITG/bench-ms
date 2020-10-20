@@ -1,16 +1,25 @@
 const { tracer } = require("./jaeger");
 const express = require("express");
 const { Tags, FORMAT_HTTP_HEADERS } = require("opentracing");
+const mysql = require("mysql2");
 const app = express();
 const cors = require("cors");
 const bodyParser = require("body-parser");
-const users = require("./data");
 // enabling cors
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+// get the client
 
-app.get("/user/:userId", (req, res) => {
+// create the connection to database
+const db = mysql.createConnection({
+  host: process.env.DB_HOST || "localhost",
+  user: process.env.DB_USER || "root",
+  password: process.env.DB_PASSWORD || "root",
+  database: "benchms",
+});
+
+app.get("/user/:userId", async (req, res) => {
   let traceContext = {};
   const parentSpanContext = tracer.extract(
     FORMAT_HTTP_HEADERS,
@@ -29,10 +38,15 @@ app.get("/user/:userId", (req, res) => {
   tracer.inject(span, FORMAT_HTTP_HEADERS, traceContext);
   let { userId } = req.params;
   console.log(userId);
-  let user = users.find((x) => x.userId == userId);
-  if (user) {
+  let [
+    user,
+    field,
+  ] = await db
+    .promise()
+    .execute("SELECT * FROM user WHERE Id=? LIMIT 1", [userId]);
+  if (user && user.length > 0) {
     // making a deep copy
-    user = JSON.parse(JSON.stringify(user));
+    user = JSON.parse(JSON.stringify(user[0]));
     delete user.userId;
     span.setTag(Tags.HTTP_STATUS_CODE, 200);
     span.finish();
