@@ -1,3 +1,4 @@
+require("dotenv").config();
 const { tracer } = require("./jaeger");
 const express = require("express");
 const { Tags, FORMAT_HTTP_HEADERS } = require("opentracing");
@@ -13,9 +14,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // create the connection to database
 const db = mysql.createConnection({
-  host: process.env.DB_HOST || "localhost",
-  user: process.env.DB_USER || "root",
-  password: process.env.DB_PASSWORD || "root",
+  host: process.env.DB_HOST || process.env.DB_DEVHOST,
+  user: process.env.DB_USER || process.env.DB_DEVUSER,
+  password: process.env.DB_PASSWORD || process.env.DB_DEVPASSWORD,
   database: "benchms",
 });
 
