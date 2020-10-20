@@ -1,21 +1,37 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: bench-ms-user-api
+  name: bench-ms-aggregator-api
   labels:
-    app: bench-ms-user-api
+    app: bench-ms-aggregator-api
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app: bench-ms-user-api
+      app: bench-ms-aggregator-api
   template:
     metadata:
       labels:
-        app: bench-ms-user-api
+        app: bench-ms-aggregator-api
     spec:
       containers:
-        - name: bench-ms-user-api
-          image: akashgupta01/bench-ms-user-api
+        - name: bench-ms-aggregator-api
+          image: akashgupta01/bench-ms-aggregator-api:latest
           ports:
-            - containerPort: 7001
+            - containerPort: 7003
+          env:
+            - name: USER_API_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: bench-ms-config
+                  key: USER_API_URL
+            - name: ORDERS_API_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: bench-ms-config
+                  key: ORDERS_API_URL
+            - name: JAEGER_COLLECTORS_ENDPOINT
+              valueFrom:
+                configMapKeyRef:
+                  name: bench-ms-config
+                  key: JAEGER_COLLECTORS_ENDPOINT
